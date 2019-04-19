@@ -20,11 +20,17 @@ public class ImageUploadTask extends Task {
         mOnUploadTaskListener = taskListener;
     }
 
+    /**
+     * 同步方法（因为图片上传是异步操作，所以这个方法不适用）
+     */
     @Override
     public void run() {
 
     }
 
+    /**
+     * 异步方法方法
+     */
     @Override
     public void runAsynchronous(final OnTaskAnsyListener listener) {
         mStrategy.uploadImageWithListener(mCurrTaskSequence, imagePath, mOptions,
