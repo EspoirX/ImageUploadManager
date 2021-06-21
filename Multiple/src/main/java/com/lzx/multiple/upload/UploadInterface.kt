@@ -7,6 +7,8 @@ interface UploadInterface {
 interface UploadCallback {
     fun onUploadStart()
     fun onUploadProgress(progress: Int, totalProgress: Int)
-    fun onUploadSuccess(url: String)
+
+    //otherParams:上传成功后可能有一些其他的业务信息,通过这个传递出去
+    fun onUploadSuccess(url: String, otherParams: HashMap<String, Any>? = null)
     fun onUploadFail(errCode: Int, errMsg: String?)
 }

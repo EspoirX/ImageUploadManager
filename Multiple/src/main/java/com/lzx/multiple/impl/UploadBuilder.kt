@@ -2,16 +2,15 @@ package com.lzx.multiple.impl
 
 import android.os.Build
 import android.os.Process
-import android.util.Log
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.lzx.multiple.MultipleUpload
 import com.lzx.multiple.MultipleUploadObserver
 import com.lzx.multiple.MultipleUploadStateLiveData
 import com.lzx.multiple.OnMultipleUploadState
 import com.lzx.multiple.OnSingleUploadState
 import com.lzx.multiple.SingleUploadObserver
 import com.lzx.multiple.UploadStateLiveData
+import com.lzx.multiple.intercept.UploadIntercept
 import com.lzx.multiple.multipleUploadObserver
 import com.lzx.multiple.singleUploadObserver
 import com.lzx.multiple.upload.UploadInterface
@@ -23,10 +22,10 @@ import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.system.measureTimeMillis
 
 abstract class UploadBuilder(private val owner: LifecycleOwner?) {
 
+    internal val interceptors = mutableListOf<Pair<UploadIntercept, String>>()
     internal var uploadNut: UploadInterface? = null
     internal var filter: UploadFilter? = null
     internal var supportDispatcher: ExecutorCoroutineDispatcher
@@ -73,6 +72,14 @@ abstract class UploadBuilder(private val owner: LifecycleOwner?) {
     }
 
     /**
+     * 添加拦截器
+     */
+    fun addInterceptor(
+        interceptor: UploadIntercept,
+        interceptThread: String = UploadIntercept.UI,
+    ) = apply { interceptors.add(Pair(interceptor, interceptThread)) }
+
+    /**
      * 单个上传监听，dsl形式
      */
     fun singleUploadObserver(observer: SingleUploadObserver.() -> Unit) = apply {
@@ -108,10 +115,7 @@ abstract class UploadBuilder(private val owner: LifecycleOwner?) {
      * 发起上传
      */
     fun upload() {
-        val time = measureTimeMillis {
-            asyncRun(owner?.lifecycleScope, singleLiveData, multipleLiveData)
-        }
-        Log.i(MultipleUpload.TAG, "上传总时间 = $time")
+        asyncRun(owner?.lifecycleScope, singleLiveData, multipleLiveData)
     }
 }
 

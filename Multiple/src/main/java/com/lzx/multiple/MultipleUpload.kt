@@ -2,6 +2,7 @@ package com.lzx.multiple
 
 import android.app.Activity
 import android.content.Context
+import android.os.Handler
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -12,6 +13,7 @@ import com.lzx.multiple.impl.MultipleUploadManager
 import com.lzx.multiple.impl.SingleUploadManager
 import com.lzx.multiple.impl.UploadBuilder
 import java.io.File
+
 
 /**
  * 通用多线程并行上传框架
@@ -106,6 +108,7 @@ class UploadState {
     var errorCode: Int = -1      //失败信息
     var errMsg: String? = null  //失败信息
     var index: Int = 0          //当前上传第几个
+    var otherParams: HashMap<String, Any>? = hashMapOf()  //上传成功后可能有一些其他的业务信息，通过这个获取
 }
 
 /***多个上传状态 */
@@ -128,7 +131,7 @@ class MultipleUploadState {
 class SingleUploadObserver {
     internal var start: ((index: Int) -> Unit)? = null
     internal var progress: ((index: Int, progress: Int, totalProgress: Int) -> Unit)? = null
-    internal var success: ((index: Int, url: String?) -> Unit)? = null
+    internal var success: ((index: Int, url: String?, otherParams: HashMap<String, Any>?) -> Unit)? = null
     internal var fail: ((index: Int, errCode: Int, errMsg: String?) -> Unit)? = null
 
     fun onStart(start: (index: Int) -> Unit) {
@@ -139,7 +142,7 @@ class SingleUploadObserver {
         this.progress = progress
     }
 
-    fun onSuccess(success: (index: Int, url: String?) -> Unit) {
+    fun onSuccess(success: (index: Int, url: String?, otherParams: HashMap<String, Any>?) -> Unit) {
         this.success = success
     }
 
@@ -174,7 +177,7 @@ fun UploadStateLiveData.singleUploadObserver(owner: LifecycleOwner?, observer: S
             when (it.currState) {
                 UploadState.Start -> result.start?.invoke(it.index)
                 UploadState.Progress -> result.progress?.invoke(it.index, it.progress, it.totalProgress)
-                UploadState.Success -> result.success?.invoke(it.index, it.url)
+                UploadState.Success -> result.success?.invoke(it.index, it.url, it.otherParams)
                 UploadState.Fail -> result.fail?.invoke(it.index, it.errorCode, it.errMsg)
             }
         })
@@ -192,6 +195,15 @@ fun MultipleUploadStateLiveData.multipleUploadObserver(owner: LifecycleOwner?, o
                 MultipleUploadState.Fail -> result.fail?.invoke(it.catchIndex, it.errMsg)
             }
         })
+    }
+}
+
+/**
+ * 解决数据丢失问题
+ */
+fun UploadStateLiveData.postValueFix(handler: Handler, state: UploadState) {
+    handler.post {
+        setValue(state)
     }
 }
 
