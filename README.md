@@ -155,3 +155,28 @@ multipleUploadObserver 就是这个作用，同样两个重载，接口形式和
 
 #### 9. upload
 发起上传逻辑，调用这个方法后才会真正发起上传逻辑。
+
+### Flow 多线程并行并且按顺序返回原理：
+```kotlin
+scope?.launch {
+    uploadList.mapIndexed { index, path ->
+        scope.async(supportDispatcher) {
+            uploadImpl()
+        }
+    }.asFlow().map {
+        it.await()
+    }.flowOn(supportDispatcher)
+}
+```
+是的，就是这么几行代码。
+
+### 运行效果
+
+示例代码大家可以在 MainActivity 中找到，这里模拟上传，每个文件上传需要一秒。
+
+1. 单个文件上传效果
+<a href="art/1.jpg"><img src="art/1.jpg"/></a>
+
+
+2. 3个文件同时上传效果
+<a href="art/2.jpg"><img src="art/2.jpg"/></a>
