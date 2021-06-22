@@ -175,8 +175,10 @@ scope?.launch {
 示例代码大家可以在 MainActivity 中找到，这里模拟上传，每个文件上传需要一秒。
 
 1. 单个文件上传效果
-<a href="art/1.jpg"><img src="art/1.jpg"/></a>
+
+<a href="art/1.png"><img src="art/1.png"/></a>
 
 
 2. 3个文件同时上传效果
-<a href="art/2.jpg"><img src="art/2.jpg"/></a>
+
+<a href="art/2.png"><img src="art/2.png"/></a>
