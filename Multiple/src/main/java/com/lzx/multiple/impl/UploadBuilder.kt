@@ -28,6 +28,7 @@ abstract class UploadBuilder(private val owner: LifecycleOwner?) {
     internal val interceptors = mutableListOf<Pair<UploadIntercept, String>>()
     internal var uploadNut: UploadInterface? = null
     internal var filter: UploadFilter? = null
+    internal var filterDsl: ((String) -> Boolean) = { true }
     internal var supportDispatcher: ExecutorCoroutineDispatcher
     private var singleLiveData = UploadStateLiveData()
     private var multipleLiveData = MultipleUploadStateLiveData()
@@ -72,11 +73,18 @@ abstract class UploadBuilder(private val owner: LifecycleOwner?) {
     }
 
     /**
+     * 配置url过滤器,dsl
+     */
+    fun filter(filter: (String) -> Boolean) = apply {
+        filterDsl = filter
+    }
+
+    /**
      * 添加拦截器
      */
     fun addInterceptor(
         interceptor: UploadIntercept,
-        interceptThread: String = UploadIntercept.UI,
+        interceptThread: String = UploadIntercept.UI
     ) = apply { interceptors.add(Pair(interceptor, interceptThread)) }
 
     /**

@@ -47,11 +47,12 @@ class MainActivity : AppCompatActivity() {
             MultipleUpload
                 .with(this@MainActivity)
                 .load("IMG_20210621_145921.jpg".toSdcardPath())
-                .filter(object : UploadFilter {
-                    override fun apply(path: String): Boolean {
-                        return path.contains("IMG_20210621_145921")
-                    }
-                })
+//                .filter(object : UploadFilter {
+//                    override fun apply(path: String): Boolean {
+//                        return path.contains("IMG_20210621_145921")
+//                    }
+//                })
+                .filter { it.contains("IMG_20210621_145921") }
                 .addInterceptor(object : UploadIntercept() {
                     override fun processSingle(path: String, callback: InterceptCallback) {
                         super.processSingle(path, callback)
