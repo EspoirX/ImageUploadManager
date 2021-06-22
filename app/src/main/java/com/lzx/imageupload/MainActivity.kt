@@ -12,7 +12,6 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.lzx.multiple.MultipleUpload
-import com.lzx.multiple.impl.UploadFilter
 import com.lzx.multiple.intercept.InterceptCallback
 import com.lzx.multiple.intercept.UploadIntercept
 import com.lzx.multiple.upload.UploadCallback
@@ -46,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn1).setOnClickListener {
             MultipleUpload
                 .with(this@MainActivity)
-                .load("IMG_20210621_145921.jpg".toSdcardPath())
+                .load("0.jpg".toSdcardPath())
 //                .filter(object : UploadFilter {
 //                    override fun apply(path: String): Boolean {
 //                        return path.contains("IMG_20210621_145921")
@@ -101,9 +100,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.btn2).setOnClickListener {
             var startTime: Long = 0
             val paths = mutableListOf<String?>()
-            paths.add("IMG_20210621_145921.jpg".toSdcardPath())
-            paths.add("IMG_20210621_145921.jpg".toSdcardPath())
-            paths.add("IMG_20210621_145921.jpg".toSdcardPath())
+            paths.add("0.jpg".toSdcardPath())
+            paths.add("1.jpg".toSdcardPath())
+            paths.add("2.jpg".toSdcardPath())
             MultipleUpload
                 .with(this@MainActivity)
                 .load(paths)
@@ -176,7 +175,7 @@ class TestUpload : UploadInterface {
 
 
     override fun uploadFile(path: String, params: HashMap<String, Any>, callback: UploadCallback) {
-        val xxUpload = XXUpload()
+        val xxUpload = XXUpload(path)
         xxUpload.callback = object : XXUpload.Callback {
             override fun onStart() {
                 callback.onUploadStart()
@@ -198,7 +197,7 @@ fun String.toSdcardPath(): String {
     return Environment.getExternalStorageDirectory().absolutePath.toString() + "/" + this
 }
 
-class XXUpload {
+class XXUpload(private val path: String) {
 
     private var pro = 0
     private var totalPro = 1
@@ -212,7 +211,8 @@ class XXUpload {
                 pro++
                 sendMsg()
             } else {
-                callback?.onSuccess("我是成功url")
+                val url = path.substring(path.length - 5, path.length)
+                callback?.onSuccess("我是成功的url = " + url)
             }
         }
     }
