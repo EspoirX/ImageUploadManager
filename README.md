@@ -9,6 +9,21 @@
 3. 结合 LiveData 监听上传回调，管理生命周期
 4. 提供拦截器功能，拦截器可在主线程和子线程中使用，提供过滤器功能
 
+### 使用
+```gradle
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    implementation 'com.github.EspoirX:ImageUploadManager:v1.0'
+}
+```
+[![](https://jitpack.io/v/EspoirX/ImageUploadManager.svg)](https://jitpack.io/#EspoirX/ImageUploadManager)
+
 ### API 预览：
 ```kotlin
 MultipleUpload
